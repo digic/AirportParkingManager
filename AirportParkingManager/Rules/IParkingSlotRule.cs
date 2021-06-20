@@ -9,6 +9,6 @@ namespace AirportParkingManager.Rules
 {
     public interface IParkingSlotRule
     {
-        IEnumerable<ParkingSlot> Execute(IEnumerable<ParkingSlot> slots);
+        IEnumerable<ParkingSlot> Execute(IEnumerable<ParkingSlot> slots, ref string message);
     }
 }

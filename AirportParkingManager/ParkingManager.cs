@@ -37,22 +37,40 @@ namespace AirportParkingManager
 
             var rules = new List<IParkingSlotRule>()
             {
-                new FindAllAvailableParkingSlots()
+                new FindAllAvailableParkingSlots(),
+                  new IsPerfectFitPlaneForParkingSlotsSize(plane.Size),
+                    new IsBestFitParkingSlot(plane.Size),
+                   new FindClosestParkingSlot()
             };
 
             var parkingSlots = parkingLot.ParkingSlots.AsEnumerable();
 
-            foreach (var rule in rules)
+            string message = string.Empty;
+            var result = Process(parkingSlots, rules, ref message);
+
+            if (string.IsNullOrWhiteSpace(message))
             {
-                parkingSlots = rule.Execute(parkingSlots);
-              
+                return result;
             }
 
-            return parkingSlots;
+            return Enumerable.Empty<ParkingSlot>();
 
         }
 
+        private IEnumerable<ParkingSlot> Process(IEnumerable<ParkingSlot> parkingSlots, List<IParkingSlotRule> rules, ref string message)
+        {
 
+            foreach (var rule in rules)
+            {
+                parkingSlots = rule.Execute(parkingSlots, ref message);
+                if (!string.IsNullOrEmpty(message))
+                {
+                    continue;
+                }
+            }
+
+            return parkingSlots;
+        }
 
         private Plane getPlane(string plate, string planeModel)
         {
