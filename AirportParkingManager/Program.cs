@@ -10,12 +10,12 @@ namespace AirportParkingManager
         {
             Console.WriteLine("Hello World!");
 
-            var parkingLot = new ParkingLot(25, 50, 25);
-            parkingLot.generateParkingLot();
+            var manager = new ParkingManager();
+            Console.WriteLine(manager.Status());
+            Console.ReadLine();
 
-
-
-            Console.WriteLine($"Parking Lot has {parkingLot.ParkingSlots.Count()} Slots");
+            var slots = manager.recommend("E195");
+            Console.WriteLine(slots.Count());
             Console.ReadLine();
         }
     }

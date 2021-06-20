@@ -1,4 +1,5 @@
 ﻿using AirportParkingManager.Models;
+using AirportParkingManager.Rules;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,6 +29,56 @@ namespace AirportParkingManager
 
             return status;
 
+        }
+
+        public IEnumerable<ParkingSlot> recommend(string planeModel) {
+
+            var plane = getPlane("", planeModel);
+
+            var rules = new List<IParkingSlotRule>()
+            {
+                new FindAllAvailableParkingSlots()
+            };
+
+            var parkingSlots = parkingLot.ParkingSlots.AsEnumerable();
+
+            foreach (var rule in rules)
+            {
+                parkingSlots = rule.Execute(parkingSlots);
+              
+            }
+
+            return parkingSlots;
+
+        }
+
+
+
+        private Plane getPlane(string plate, string planeModel)
+        {
+            Sizes size;
+
+            switch (planeModel)
+            {
+                case "E195":
+
+                    size = Sizes.Prop;
+                    break;
+                case "A330":
+                case "B777":
+
+                    size = Sizes.Jet;
+                    break;
+                case "A380":
+                case "B747":
+
+                    size = Sizes.Jumbo;
+                    break;
+                default:
+                    throw new Exception($"Could not determine Plane Size for {planeModel} plane model.");
+            }
+
+            return new Plane(plate, planeModel, size);
         }
     }
 }
