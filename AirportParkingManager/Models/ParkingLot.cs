@@ -21,7 +21,25 @@ namespace AirportParkingManager.Models
             propSlots = PropSlots;
             capacity = jumboSlots + jetSlots + propSlots;
             ParkingSlots = new List<ParkingSlot>(capacity);
+        }
 
+        public void generateParkingLot()
+        {
+            int parkingNumber = 0;
+            for (int i = 0; i < propSlots; i++)
+            {
+                ParkingSlots.Add(new ParkingSlot(parkingNumber++, Sizes.Prop));
+            }
+
+            for (int i = 0; i < jetSlots; i++)
+            {
+                ParkingSlots.Add(new ParkingSlot(parkingNumber++, Sizes.Jet));
+            }
+
+            for (int i = 0; i < jumboSlots; i++)
+            {
+                ParkingSlots.Add(new ParkingSlot(parkingNumber++, Sizes.Jumbo));
+            }
         }
     }
 }

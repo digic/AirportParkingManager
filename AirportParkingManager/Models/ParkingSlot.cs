@@ -11,10 +11,12 @@ namespace AirportParkingManager.Models
         public ParkingSlot(int slotNumber, Sizes size)
         {
             SlotNumber = slotNumber;
-            Size = size;          
+            Size = size;            
         }
 
         public int SlotNumber { get; set; }
         public Sizes Size { get; set; }
+
+        public bool Available { get; set; } = true;
     }
 }
