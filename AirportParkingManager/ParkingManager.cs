@@ -31,31 +31,83 @@ namespace AirportParkingManager
 
         }
 
-        public IEnumerable<ParkingSlot> recommend(string planeModel) {
+        public ParkingSlot RecommendClosestPerfectFit(string planePlate, string planeModel, DateTime starts, DateTime ends)
+        {
 
-            var plane = getPlane("", planeModel);
 
-            var rules = new List<IParkingSlotRule>()
-            {
+            var plane = getPlane(planePlate, planeModel);
+
+            var rules = new List<IParkingSlotRule>() {
                 new FindAllAvailableParkingSlots(),
-                  new IsPerfectFitPlaneForParkingSlotsSize(plane.Size),
-                    new IsBestFitParkingSlot(plane.Size),
-                   new FindClosestParkingSlot()
+                new IsPerfectFitPlaneForParkingSlotsSize(plane.Size),
+                new IsParkingSlotAvailableForDates(starts, ends),
+                new FindClosestParkingSlot()
             };
 
-            var parkingSlots = parkingLot.ParkingSlots.AsEnumerable();
 
             string message = string.Empty;
-            var result = Process(parkingSlots, rules, ref message);
+            var result = Process(parkingLot.ParkingSlots, rules, ref message);
+
+            if (string.IsNullOrWhiteSpace(message))
+            {
+                return result.FirstOrDefault();
+            }
+            // Show message somewhere
+            return default;
+        }
+
+        public IEnumerable<ParkingSlot> RecommendBestFitSize(string planePlate, string planeModel, DateTime starts, DateTime ends)
+        {
+
+            var plane = getPlane(planePlate, planeModel);
+
+            var rules = new List<IParkingSlotRule>() {
+                new FindAllAvailableParkingSlots(),
+                new IsBestFitParkingSlot(plane.Size),
+                new IsParkingSlotAvailableForDates(starts, ends)
+            };
+
+
+            string message = string.Empty;
+            var result = Process(parkingLot.ParkingSlots, rules, ref message);
 
             if (string.IsNullOrWhiteSpace(message))
             {
                 return result;
             }
-
+            // Show message somewhere
             return Enumerable.Empty<ParkingSlot>();
-
         }
+
+
+
+
+
+
+        public bool BookParkingSlot(int slotNumber, string planePlate, string planeModel, DateTime starts, DateTime ends)
+        {
+            var plane = getPlane(planePlate, planeModel);
+
+            var rules = new List<IParkingSlotRule>() {
+                new FindParkingSlotbySlotNumber(slotNumber),
+                new IsBestFitParkingSlot(plane.Size),
+                new IsParkingSlotAvailableForDates(starts, ends)
+            };
+
+            string message = string.Empty;
+            var result = Process(parkingLot.ParkingSlots, rules, ref message);
+
+            if (string.IsNullOrWhiteSpace(message))
+            {
+                var slot = result.FirstOrDefault();
+                var lease = new Lease(plane, starts, ends);
+                return slot.bookParkingSlot(lease);
+            }
+
+            // Show message somewhere
+            return false;
+        }
+
 
         private IEnumerable<ParkingSlot> Process(IEnumerable<ParkingSlot> parkingSlots, List<IParkingSlotRule> rules, ref string message)
         {

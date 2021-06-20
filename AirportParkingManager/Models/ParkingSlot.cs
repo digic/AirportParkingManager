@@ -11,12 +11,21 @@ namespace AirportParkingManager.Models
         public ParkingSlot(int slotNumber, Sizes size)
         {
             SlotNumber = slotNumber;
-            Size = size;            
+            Size = size;
+            Leases = new List<Lease>();
         }
 
         public int SlotNumber { get; set; }
         public Sizes Size { get; set; }
 
-        public bool Available { get; set; } = true;
+        public bool Available { get => !Leases.Where(lease => lease.Active).Any(); }
+
+        public List<Lease> Leases { get; set; }
+
+        public bool bookParkingSlot(Lease lease)
+        {
+            Leases.Add(lease);
+            return true;
+        }
     }
 }
